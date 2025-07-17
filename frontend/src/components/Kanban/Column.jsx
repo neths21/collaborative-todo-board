@@ -1,12 +1,16 @@
 import TaskCard from './TaskCard';
+import { useDroppable } from '@dnd-kit/core';
 
-const Column = ({ status }) => {
+const Column = ({ status, tasks, id }) => {
+    const { setNodeRef } = useDroppable({ id });
+
     return (
-        <div className="kanban-column">
+        <div ref={setNodeRef} className="kanban-column">
             <h3>{status}</h3>
             <div className="task-list">
-                {/* Dummy task for now */}
-                <TaskCard title="Sample Task" />
+                {tasks.map((task) => (
+                    <TaskCard key={task._id} task={task} />
+                ))}
             </div>
         </div>
     );
