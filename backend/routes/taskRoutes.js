@@ -1,15 +1,20 @@
 const express = require('express');
 const {
     createTask,
-    getTasks,
     updateTask,
     deleteTask,
+    getTasks
 } = require('../controllers/taskController');
 const { protect } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.route('/').get(protect, getTasks).post(protect, createTask);
-router.route('/:id').put(protect, updateTask).delete(protect, deleteTask);
+router.route('/')
+    .get(protect, getTasks)
+    .post(protect, createTask);
+
+router.route('/:id')
+    .put(protect, updateTask)
+    .delete(protect, deleteTask);
 
 module.exports = router;

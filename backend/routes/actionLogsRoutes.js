@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ActionLog = require('../models/ActionLog');
+const { protect } = require('../middlewares/authMiddleware');
 
-// GET /api/logs?limit=20
-router.get('/', async (req, res) => {
+router.get('/', protect, async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 20;
         const logs = await ActionLog.find().sort({ timestamp: -1 }).limit(limit);
