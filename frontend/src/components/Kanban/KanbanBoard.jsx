@@ -2,7 +2,8 @@ import { useState } from 'react';
 import Column from './Column';
 import { useTasks } from '../../hooks/TasksContext';
 import { useUsers } from '../../hooks/useUsers';
-import { DndContext } from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
+import TaskCard from './TaskCard';
 
 const KanbanBoard = () => {
     const { tasks, fetchTasks, createTask, updateTask } = useTasks();
@@ -14,6 +15,7 @@ const KanbanBoard = () => {
     const [status, setStatus] = useState('Todo');
     const [priority, setPriority] = useState('Medium');
     const [assignedTo, setAssignedTo] = useState('');
+    const [activeTask, setActiveTask] = useState(null);
 
     const handleCreate = async (e) => {
         e.preventDefault();
@@ -28,8 +30,14 @@ const KanbanBoard = () => {
         setShowModal(false);
     };
 
+    const handleDragStart = (event) => {
+        const task = tasks.find((t) => t._id === event.active.id);
+        setActiveTask(task);
+    };
+
     const handleDragEnd = async (event) => {
         const { active, over } = event;
+        setActiveTask(null);
         if (!over) return;
 
         const taskId = active.id;
@@ -45,7 +53,8 @@ const KanbanBoard = () => {
     return (
         <>
             <h2 className="kanban-header">Task Board</h2>
-            <DndContext onDragEnd={handleDragEnd}>
+
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                 <div className="kanban-board">
                     {['Todo', 'In Progress', 'Done'].map((status) => (
                         <Column
@@ -57,6 +66,15 @@ const KanbanBoard = () => {
                         />
                     ))}
                 </div>
+
+                <DragOverlay>
+                    {activeTask ? (
+                        <div className="task-card drag-overlay">
+                            <h4>{activeTask.title}</h4>
+                            <p>{activeTask.description}</p>
+                        </div>
+                    ) : null}
+                </DragOverlay>
             </DndContext>
 
             <button className="open-modal-button" onClick={() => setShowModal(true)}>

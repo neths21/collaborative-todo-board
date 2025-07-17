@@ -12,7 +12,6 @@ const TaskCard = ({ task, onRefresh }) => {
     const { deleteTask, updateTask } = useTasks();
 
     const [loading, setLoading] = useState(false);
-    const [showDetails, setShowDetails] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
 
     const [title, setTitle] = useState(task.title);
@@ -20,13 +19,9 @@ const TaskCard = ({ task, onRefresh }) => {
     const [priority, setPriority] = useState(task.priority || 'Medium');
     const [assignedTo, setAssignedTo] = useState(task.assignedTo?._id || '');
 
-    const style = {
-        transform: transform
-            ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-            : undefined,
-        cursor: 'grab',
-        opacity: loading ? 0.5 : 1,
-    };
+    const dragStyle = transform
+        ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+        : {};
 
     const handleSmartAssign = async () => {
         setLoading(true);
@@ -62,34 +57,27 @@ const TaskCard = ({ task, onRefresh }) => {
     };
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...listeners}
-            {...attributes}
-            className="task-card"
-            onClick={() => setShowDetails(!showDetails)}
-        >
-            <h4>{task.title}</h4>
+        <div className="task-card">
+            {/* ✅ Only this part is draggable */}
+            <h4 ref={setNodeRef} {...listeners} {...attributes} style={dragStyle}>
+                {task.title}
+            </h4>
+
+            <p><strong>Description:</strong> {task.description || 'No description'}</p>
+            <p><strong>Priority:</strong> {task.priority}</p>
+            <p><strong>Assigned To:</strong> {task.assignedTo?.name || 'Unassigned'}</p>
+
             <div className="task-actions">
-                <button className="small-button" onClick={(e) => { e.stopPropagation(); handleSmartAssign(); }}>
+                <button className="small-button" onClick={handleSmartAssign}>
                     Smart Assign
                 </button>
-                <button className="small-button delete" onClick={(e) => { e.stopPropagation(); handleDelete(); }}>
+                <button className="small-button delete" onClick={handleDelete}>
                     Delete
                 </button>
-                <button className="small-button update" onClick={(e) => { e.stopPropagation(); setShowUpdateModal(true); }}>
+                <button className="small-button update" onClick={() => setShowUpdateModal(true)}>
                     Update
                 </button>
             </div>
-
-            {showDetails && (
-                <div className="task-details">
-                    <p><strong>Description:</strong> {task.description || 'No description'}</p>
-                    <p><strong>Priority:</strong> {task.priority}</p>
-                    <p><strong>Assigned To:</strong> {task.assignedTo?.name || 'Unassigned'}</p>
-                </div>
-            )}
 
             {showUpdateModal && (
                 <div className="modal-overlay">
@@ -112,6 +100,7 @@ const TaskCard = ({ task, onRefresh }) => {
                                 <option>Medium</option>
                                 <option>High</option>
                             </select>
+
                             <label>Assign To:</label>
                             <select
                                 value={assignedTo}
@@ -124,8 +113,13 @@ const TaskCard = ({ task, onRefresh }) => {
                                     </option>
                                 ))}
                             </select>
+
                             <button type="submit">Update Task</button>
-                            <button type="button" onClick={() => setShowUpdateModal(false)} className="cancel-button">
+                            <button
+                                type="button"
+                                onClick={() => setShowUpdateModal(false)}
+                                className="cancel-button"
+                            >
                                 Cancel
                             </button>
                         </form>

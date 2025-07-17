@@ -1,4 +1,3 @@
-// src/hooks/useUsers.js
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
 import { useAuth } from './useAuth';

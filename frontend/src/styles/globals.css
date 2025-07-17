@@ -1,72 +1,40 @@
-.auth-container {
+/* ===== Page Layout ===== */
+.kanban-page-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 2rem;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.kanban-main-board {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
-}
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 300px;
-}
-input {
-    padding: 0.5rem;
-    font-size: 1rem;
-}
-button {
-    padding: 0.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-}
-.kanban-board {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-}
-
-.kanban-column {
     flex: 1;
-    background-color: #f4f4f4;
-    padding: 1rem;
-    border-radius: 8px;
-    min-height: 300px;
 }
 
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.task-card {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.1);
-}
-/* ============================
-   ✅ Kanban Board Styling
-   ============================ */
-
+/* ===== Kanban Board ===== */
 .kanban-board {
     display: flex;
+    flex-wrap: nowrap;
     gap: 20px;
     justify-content: center;
-    align-items: flex-start;
+    width: 100%;
+    max-width: 950px;
     padding: 1rem;
-    flex-wrap: wrap;
-    transition: 0.3s;
+    box-sizing: border-box;
 }
 
 .kanban-column {
     background: #f5f5f5;
     border-radius: 8px;
     padding: 1rem;
-    width: 280px;
+    min-width: 250px;
+    flex: 1 1 250px;
     min-height: 400px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: 0.3s;
 }
 
 .kanban-column h3 {
@@ -75,6 +43,7 @@ button {
     color: #333;
 }
 
+/* ===== Task Card ===== */
 .task-list {
     display: flex;
     flex-direction: column;
@@ -88,6 +57,7 @@ button {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     cursor: grab;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .task-card:hover {
@@ -95,238 +65,26 @@ button {
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.create-task-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.create-task-form input {
-    padding: 0.5rem;
-    font-size: 1rem;
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: 0.3s;
-}
-
-.create-task-form input:focus {
-    border-color: #999;
-    outline: none;
-}
-
-.create-task-form button {
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.create-task-form button:hover {
-    background-color: #0056b3;
-}
-
-@media (max-width: 768px) {
-    .kanban-board {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-.open-modal-button {
-    margin: 1rem auto;
-    display: block;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.open-modal-button:hover {
-    background-color: #0056b3;
-}
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-content input,
-.modal-content select {
-    padding: 0.5rem;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.modal-content button {
-    padding: 0.5rem;
-    width: 100%;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.modal-content button[type="submit"] {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-}
-
-.modal-content .cancel-button {
-    background-color: #ddd;
-    color: #333;
-    border: none;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.open-modal-button {
-    margin: 1rem auto;
-    display: block;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.open-modal-button:hover {
-    background-color: #0056b3;
-}
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-content input,
-.modal-content select {
-    padding: 0.5rem;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.modal-content button {
-    padding: 0.5rem;
-    width: 100%;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.modal-content button[type="submit"] {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-}
-
-.modal-content .cancel-button {
-    background-color: #ddd;
-    color: #333;
-    border: none;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.task-card {
-    width: 100%;
-    min-height: 100px;
-    position: relative;
-    perspective: 800px;
-}
-
-.card-inner {
-    width: 100%;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    position: relative;
-}
-
-.task-card.flipped .card-inner {
-    transform: rotateY(180deg);
-}
-
-.card-front, .card-back {
-    backface-visibility: hidden;
-    position: absolute;
-    width: 100%;
-    padding: 0.5rem;
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    min-height: 100px;
-}
-
-.card-back {
-    transform: rotateY(180deg);
-}
-
 .task-actions {
     display: flex;
     gap: 5px;
     margin-top: 0.5rem;
+}
+
+.task-actions button {
+    pointer-events: auto;
+}
+
+.task-details {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.task-details p {
+    margin: 0.25rem 0;
 }
 
 .small-button {
@@ -356,20 +114,330 @@ button {
     background-color: #007bff;
     color: #fff;
 }
-.task-details {
+
+/* ===== Create / Update Modal ===== */
+.open-modal-button {
+    margin: 1rem auto;
+    display: block;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.open-modal-button:hover {
+    background-color: #0056b3;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-content input,
+.modal-content select {
+    padding: 0.7rem;
+    width: 100%;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-content label {
+    font-weight: 500;
     margin-top: 0.5rem;
-    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+    display: block;
+    color: #333;
+}
+
+.modal-content button {
+    padding: 0.7rem;
+    font-size: 1rem;
+    width: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-content button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.modal-content .cancel-button {
+    background-color: #ddd;
+    color: #333;
+    border: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Activity Log ===== */
+.activity-log-panel {
+    background-color: #fff8e1;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    width: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    border-left: 5px solid #ffc107;
+    transition: 0.3s;
+}
+
+.activity-log-panel h3 {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.activity-log-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-log-panel li {
+    font-size: 0.9rem;
     color: #555;
-    padding-top: 0.5rem;
-    border-top: 1px solid #eee;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #eee;
 }
-.task-details p {
-    margin: 0.25rem 0;
+
+.activity-log-panel li:last-child {
+    border-bottom: none;
 }
+
+/* ===== Headers ===== */
 .kanban-header {
     text-align: center;
     font-size: 1.8rem;
     font-weight: 600;
-    margin-top: 1rem;
+    margin: 1rem 0;
     color: #333;
+}
+
+/* ===== Login/Register Auth ===== */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.auth-container h2 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 2rem;
+}
+
+.auth-container form {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 300px;
+}
+
+.auth-container input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.auth-container button {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.auth-container button:hover {
+    background-color: #0056b3;
+}
+
+.switch-link {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.switch-link a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.switch-link a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Drag Overlay ===== */
+.drag-overlay {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    opacity: 0.9;
+    transform: scale(1.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 900px) {
+    .kanban-page-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .kanban-board {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .activity-log-panel {
+        width: 90%;
+        max-width: 400px;
+        margin-top: 1rem;
+    }
+}
+.kanban-page-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Move Activity Log to left */
+.activity-log-panel {
+    order: -1; /* ensures it stays left */
+    background-color: #fff8e1;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    width: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+    border-left: 5px solid #ffc107;
+    transition: 0.3s;
+}
+
+.activity-log-panel h3 {
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.activity-log-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-log-panel li {
+    font-size: 0.9rem;
+    color: #555;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-log-panel li:last-child {
+    border-bottom: none;
+}
+
+/* Adjust Kanban board to flex correctly next to Activity Log */
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+.kanban-page-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.kanban-main-board {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.activity-log-panel {
+    flex: 0 0 280px;
+    background-color: #fff8e1;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    max-height: 500px;
+    overflow-y: auto;
+    border-left: 5px solid #ffc107;
+    min-width: 250px;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.kanban-column {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 250px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }

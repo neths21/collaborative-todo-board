@@ -6,6 +6,7 @@ const TasksContext = createContext();
 
 export const TasksProvider = ({ children }) => {
     const [tasks, setTasks] = useState([]);
+    const [conflict, setConflict] = useState(null);
     const { user } = useAuth();
 
     const fetchTasks = async () => {
@@ -30,16 +31,19 @@ export const TasksProvider = ({ children }) => {
         }
     };
 
-    const updateTask = async (taskId, updates) => {
+    const updateTask = async (taskId, updates, force = false) => {
         try {
-            await api.put(`/tasks/${taskId}`, updates, {
+            await api.put(`/tasks/${taskId}`, { ...updates, force }, {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
             await fetchTasks();
         } catch (err) {
             if (err.response?.status === 409) {
-                alert('Conflict: Another user updated this task recently.');
-                await fetchTasks();
+                setConflict({
+                    taskId,
+                    clientTask: updates,
+                    serverTask: err.response.data.serverTask,
+                });
             } else {
                 console.error('Failed to update task:', err);
             }
@@ -62,7 +66,7 @@ export const TasksProvider = ({ children }) => {
     }, [user]);
 
     return (
-        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, createTask, updateTask, deleteTask }}>
+        <TasksContext.Provider value={{ tasks, setTasks, fetchTasks, createTask, updateTask, deleteTask, conflict, setConflict }}>
             {children}
         </TasksContext.Provider>
     );

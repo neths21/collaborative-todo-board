@@ -91,8 +91,12 @@ exports.deleteTask = async (req, res) => {
 };
 
 // 🔹 SMART ASSIGN
+// 🔹 SMART ASSIGN
 exports.smartAssign = async (req, res) => {
     try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'Task not found' });
+
         const users = await User.find();
         const priorityWeights = { 'Low': 1, 'Medium': 2, 'High': 3 };
 
@@ -120,9 +124,6 @@ exports.smartAssign = async (req, res) => {
         const candidates = userStats.filter(u => u.count === minTaskCount);
         const selectedUser = candidates.sort((a, b) => a.avgWeight - b.avgWeight)[0].user;
 
-        const task = await Task.findById(req.params.id);
-        if (!task) return res.status(404).json({ message: 'Task not found' });
-
         // Prevent useless reassignment
         if (task.assignedTo?.toString() === selectedUser._id.toString()) {
             return res.status(200).json({
@@ -131,16 +132,30 @@ exports.smartAssign = async (req, res) => {
             });
         }
 
+        // Update the task
         task.assignedTo = selectedUser._id;
-        await task.save();
+        task.updatedAt = new Date(); // Ensure updatedAt is set
+        const savedTask = await task.save();
 
-        const updatedTask = await Task.findById(task._id).populate('assignedTo');
+        // Log the action
+        await logAction({
+            userId: req.user.id,
+            userName: req.user.name,
+            actionType: 'SMART_ASSIGN',
+            taskId: savedTask._id,
+            taskTitle: savedTask.title,
+            details: `Smart assigned to ${selectedUser.name}`
+        });
+
+        // Return the populated task
+        const populatedTask = await Task.findById(savedTask._id).populate('assignedTo');
 
         return res.status(200).json({
             message: `Assigned to ${selectedUser.name}`,
-            task: updatedTask,
+            task: populatedTask,
         });
     } catch (error) {
+        console.error('Smart assign error:', error);
         res.status(500).json({ message: error.message });
     }
 };

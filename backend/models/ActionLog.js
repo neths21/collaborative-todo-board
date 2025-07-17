@@ -2,12 +2,11 @@ const mongoose = require('mongoose');
 
 const ActionLogSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    userName: { type: String },
-    actionType: { type: String, required: true },
+    userName: String,
+    actionType: String,
     taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
-    taskTitle: { type: String },
-    details: { type: String },
-    timestamp: { type: Date, default: Date.now },
-});
+    taskTitle: String,
+    details: String,
+}, { timestamps: true }); // ✅ This auto-creates createdAt
 
 module.exports = mongoose.model('ActionLog', ActionLogSchema);
