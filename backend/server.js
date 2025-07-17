@@ -5,6 +5,10 @@ app.use('/api/auth', authRoutes);
 const taskRoutes = require('./routes/taskRoutes');
 app.use('/api/tasks', taskRoutes);
 
+const actionLogsRoutes = require('./routes/actionLogsRoutes');
+app.use('/api/logs', actionLogsRoutes);
+
+
 // Existing requires
 const express = require('express');
 const mongoose = require('mongoose');
