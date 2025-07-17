@@ -35,6 +35,15 @@ exports.updateTask = async (req, res) => {
         const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
+        // Conflict Check
+        const clientUpdatedAt = new Date(req.body.updatedAt);
+        if (task.updatedAt > clientUpdatedAt) {
+            return res.status(409).json({
+                message: 'Conflict detected. Task was updated by someone else.',
+                serverTask: task
+            });
+        }
+
         Object.assign(task, req.body);
         const updatedTask = await task.save();
 
@@ -52,6 +61,7 @@ exports.updateTask = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
 
 // 🔹 DELETE a task
 exports.deleteTask = async (req, res) => {
