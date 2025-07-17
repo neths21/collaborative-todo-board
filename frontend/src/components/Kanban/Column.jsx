@@ -1,7 +1,7 @@
 import TaskCard from './TaskCard';
 import { useDroppable } from '@dnd-kit/core';
 
-const Column = ({ status, tasks, id }) => {
+const Column = ({ status, tasks, id, onRefresh }) => {
     const { setNodeRef } = useDroppable({ id });
 
     return (
@@ -9,7 +9,7 @@ const Column = ({ status, tasks, id }) => {
             <h3>{status}</h3>
             <div className="task-list">
                 {tasks.map((task) => (
-                    <TaskCard key={task._id} task={task} />
+                    <TaskCard key={task._id} task={task} onRefresh={onRefresh} />
                 ))}
             </div>
         </div>

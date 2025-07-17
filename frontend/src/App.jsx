@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import KanbanPage from './pages/KanbanPage';
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 
 function AppRoutes() {
     const { user } = useAuth();
@@ -18,11 +18,9 @@ function AppRoutes() {
 
 function App() {
     return (
-        <AuthProvider>
-            <Router>
-                <AppRoutes />
-            </Router>
-        </AuthProvider>
+        <Router>
+            <AppRoutes />
+        </Router>
     );
 }
 

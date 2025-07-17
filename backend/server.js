@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
 
 // Attach io to app so controllers can emit events
 app.set('io', io);
-
+module.exports = io;
 // Routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
@@ -43,6 +43,8 @@ app.use('/api/tasks', taskRoutes);
 
 const actionLogsRoutes = require('./routes/actionLogsRoutes');
 app.use('/api/logs', actionLogsRoutes);
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 http.listen(PORT, () => console.log(`Server running on port ${PORT}`));

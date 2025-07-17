@@ -1,14 +1,19 @@
-
+const Task = require('../models/Task');
+const User = require('../models/User');
+const { logAction } = require('./actionLogger');
 
 // 🔹 GET all tasks for board (or project)
 exports.getTasks = async (req, res) => {
     try {
-        const tasks = await Task.find();
+        const tasks = await Task.find()
+            .populate('assignedTo', 'name') // Only fetch user name (optional, cleaner)
+            .sort({ createdAt: -1 }); // Sort newest tasks first
         res.status(200).json(tasks);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
 
 // 🔹 CREATE a task
 exports.createTask = async (req, res) => {
@@ -22,7 +27,8 @@ exports.createTask = async (req, res) => {
             taskTitle: task.title,
             details: 'Task created in Todo'
         });
-        res.status(201).json(task);
+        const populatedTask = await Task.findById(task._id).populate('assignedTo');
+        res.status(201).json(populatedTask);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
@@ -45,7 +51,6 @@ exports.updateTask = async (req, res) => {
 
         Object.assign(task, req.body);
         const updatedTask = await task.save();
-
         await logAction({
             userId: req.user.id,
             userName: req.user.name,
@@ -55,12 +60,12 @@ exports.updateTask = async (req, res) => {
             details: `Updated fields: ${Object.keys(req.body).join(', ')}`
         });
 
-        res.status(200).json(updatedTask);
+        const populatedTask = await Task.findById(updatedTask._id).populate('assignedTo');
+        res.status(200).json(populatedTask);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
 
 // 🔹 DELETE a task
 exports.deleteTask = async (req, res) => {
@@ -85,49 +90,56 @@ exports.deleteTask = async (req, res) => {
     }
 };
 
-//smart assign
-const User = require('../models/User');
-const Task = require('../models/Task');
-const { logAction } = require('./actionLogger');
-
-// Smart Assign Controller
+// 🔹 SMART ASSIGN
 exports.smartAssign = async (req, res) => {
     try {
-        // Get all users
         const users = await User.find();
+        const priorityWeights = { 'Low': 1, 'Medium': 2, 'High': 3 };
 
-        // For each user, count active tasks (Todo or In Progress)
-        const userTaskCounts = await Promise.all(
-            users.map(async (user) => {
-                const count = await Task.countDocuments({
-                    assignedTo: user._id,
-                    status: { $in: ['Todo', 'In Progress'] }
-                });
-                return { user, count };
-            })
-        );
+        const activeTasks = await Task.find({
+            status: { $in: ['Todo', 'In Progress'] },
+            assignedTo: { $exists: true },
+        });
 
-        // Find user with fewest active tasks
-        const sorted = userTaskCounts.sort((a, b) => a.count - b.count);
-        const selectedUser = sorted[0].user;
+        const userStats = users.map(user => {
+            const userTasks = activeTasks.filter(task =>
+                task.assignedTo?.toString() === user._id.toString()
+            );
 
-        // Assign this task to them
+            const count = userTasks.length;
+            const totalWeight = userTasks.reduce(
+                (acc, task) => acc + (priorityWeights[task.priority] || 0),
+                0
+            );
+            const avgWeight = count > 0 ? totalWeight / count : 0;
+
+            return { user, count, totalWeight, avgWeight };
+        });
+
+        const minTaskCount = Math.min(...userStats.map(u => u.count));
+        const candidates = userStats.filter(u => u.count === minTaskCount);
+        const selectedUser = candidates.sort((a, b) => a.avgWeight - b.avgWeight)[0].user;
+
         const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ message: 'Task not found' });
+
+        // Prevent useless reassignment
+        if (task.assignedTo?.toString() === selectedUser._id.toString()) {
+            return res.status(200).json({
+                message: `Already assigned to ${selectedUser.name}`,
+                task: await Task.findById(task._id).populate('assignedTo'),
+            });
+        }
 
         task.assignedTo = selectedUser._id;
         await task.save();
 
-        await logAction({
-            userId: req.user.id,
-            userName: req.user.name,
-            actionType: 'ASSIGN_TASK',
-            taskId: task._id,
-            taskTitle: task.title,
-            details: `Smart Assigned to ${selectedUser.name}`
-        });
+        const updatedTask = await Task.findById(task._id).populate('assignedTo');
 
-        res.status(200).json({ message: `Assigned to ${selectedUser.name}`, task });
+        return res.status(200).json({
+            message: `Assigned to ${selectedUser.name}`,
+            task: updatedTask,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

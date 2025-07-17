@@ -1,52 +1,117 @@
+import { useState } from 'react';
 import Column from './Column';
-import { useTasks } from '../../hooks/useTasks';
+import { useTasks } from '../../hooks/TasksContext';
+import { useUsers } from '../../hooks/useUsers';
 import { DndContext } from '@dnd-kit/core';
-import api from '../../utils/api';
-import { useAuth } from '../../hooks/useAuth';
 
 const KanbanBoard = () => {
-    const { tasks, setTasks } = useTasks();
-    const { user } = useAuth();
+    const { tasks, fetchTasks, createTask, updateTask } = useTasks();
+    const { users } = useUsers();
+
+    const [showModal, setShowModal] = useState(false);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [status, setStatus] = useState('Todo');
+    const [priority, setPriority] = useState('Medium');
+    const [assignedTo, setAssignedTo] = useState('');
+
+    const handleCreate = async (e) => {
+        e.preventDefault();
+        if (!title.trim()) return;
+
+        await createTask({ title, description, status, priority, assignedTo });
+        setTitle('');
+        setDescription('');
+        setStatus('Todo');
+        setPriority('Medium');
+        setAssignedTo('');
+        setShowModal(false);
+    };
 
     const handleDragEnd = async (event) => {
         const { active, over } = event;
-
-        if (!over) return; // No target column
+        if (!over) return;
 
         const taskId = active.id;
         const newStatus = over.id;
+        const draggedTask = tasks.find((task) => task._id === taskId);
 
-        try {
-            const { data } = await api.put(`/tasks/${taskId}`, {
-                status: newStatus,
-                updatedAt: new Date(),
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
-
-            setTasks((prev) =>
-                prev.map((task) =>
-                    task._id === taskId ? { ...task, status: newStatus } : task
-                )
-            );
-        } catch (err) {
-            console.error(err);
-        }
+        await updateTask(taskId, {
+            status: newStatus,
+            updatedAt: draggedTask.updatedAt,
+        });
     };
 
     return (
-        <DndContext onDragEnd={handleDragEnd}>
-            <div className="kanban-board">
-                {['Todo', 'In Progress', 'Done'].map((status) => (
-                    <Column
-                        key={status}
-                        id={status}
-                        status={status}
-                        tasks={tasks.filter((task) => task.status === status)}
-                    />
-                ))}
-            </div>
-        </DndContext>
+        <>
+            <h2 className="kanban-header">Task Board</h2>
+            <DndContext onDragEnd={handleDragEnd}>
+                <div className="kanban-board">
+                    {['Todo', 'In Progress', 'Done'].map((status) => (
+                        <Column
+                            key={status}
+                            id={status}
+                            status={status}
+                            tasks={tasks.filter((task) => task.status === status)}
+                            onRefresh={fetchTasks}
+                        />
+                    ))}
+                </div>
+            </DndContext>
+
+            <button className="open-modal-button" onClick={() => setShowModal(true)}>
+                + Add Task
+            </button>
+
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Create New Task</h3>
+                        <form onSubmit={handleCreate}>
+                            <input
+                                type="text"
+                                placeholder="Task Title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                required
+                            />
+                            <input
+                                type="text"
+                                placeholder="Description (optional)"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <option>Todo</option>
+                                <option>In Progress</option>
+                                <option>Done</option>
+                            </select>
+                            <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                            <label>Assign To:</label>
+                            <select
+                                value={assignedTo}
+                                onChange={(e) => setAssignedTo(e.target.value)}
+                            >
+                                <option value="">Unassigned</option>
+                                {users.map((user) => (
+                                    <option key={user._id} value={user._id}>
+                                        {user.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button type="submit">Add Task</button>
+                            <button type="button" onClick={() => setShowModal(false)} className="cancel-button">
+                                Cancel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
