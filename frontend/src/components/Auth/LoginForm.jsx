@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import api from '../../utils/api';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useAuth();
     const [error, setError] = useState('');
-
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const { data } = await api.post('/auth/login', { email, password });
             login(data);
+            navigate('/kanban');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         }

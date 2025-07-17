@@ -1,4 +1,11 @@
+import KanbanBoard from '../components/Kanban/KanbanBoard';
+
 const KanbanPage = () => {
-    return <h1>Kanban Page (Coming Soon)</h1>;
+    return (
+        <div className="kanban-container">
+            <KanbanBoard />
+        </div>
+    );
 };
+
 export default KanbanPage;

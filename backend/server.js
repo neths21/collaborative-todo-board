@@ -1,12 +1,3 @@
-const authRoutes = require('./routes/authRoutes');
-
-app.use('/api/auth', authRoutes);
-
-const taskRoutes = require('./routes/taskRoutes');
-app.use('/api/tasks', taskRoutes);
-
-const actionLogsRoutes = require('./routes/actionLogsRoutes');
-app.use('/api/logs', actionLogsRoutes);
 
 
 // Existing requires
@@ -45,10 +36,13 @@ app.set('io', io);
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
-const taskRoutes = require('./routes/taskRoutes');
-
 app.use('/api/auth', authRoutes);
+
+const taskRoutes = require('./routes/taskRoutes');
 app.use('/api/tasks', taskRoutes);
+
+const actionLogsRoutes = require('./routes/actionLogsRoutes');
+app.use('/api/logs', actionLogsRoutes);
 
 const PORT = process.env.PORT || 5000;
 http.listen(PORT, () => console.log(`Server running on port ${PORT}`));
