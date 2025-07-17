@@ -1,7 +1,18 @@
 const Task = require('../models/Task');
 const { logAction } = require('./actionLogger');
 
-const createTask = async (req, res) => {
+// 🔹 GET all tasks for board (or project)
+exports.getTasks = async (req, res) => {
+    try {
+        const tasks = await Task.find();
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// 🔹 CREATE a task
+exports.createTask = async (req, res) => {
     try {
         const task = await Task.create(req.body);
         await logAction({
@@ -14,29 +25,42 @@ const createTask = async (req, res) => {
         });
         res.status(201).json(task);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
-const updateTask = async (req, res) => {
+
+// 🔹 UPDATE a task (status, title, description, assignedTo, priority)
+exports.updateTask = async (req, res) => {
     try {
-        const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'Task not found' });
+
+        Object.assign(task, req.body);
+        const updatedTask = await task.save();
+
         await logAction({
             userId: req.user.id,
             userName: req.user.name,
             actionType: 'UPDATE_TASK',
-            taskId: task._id,
-            taskTitle: task.title,
-            details: `Updated task fields: ${Object.keys(req.body).join(', ')}`
+            taskId: updatedTask._id,
+            taskTitle: updatedTask.title,
+            details: `Updated fields: ${Object.keys(req.body).join(', ')}`
         });
-        res.status(200).json(task);
+
+        res.status(200).json(updatedTask);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
-const deleteTask = async (req, res) => {
+// 🔹 DELETE a task
+exports.deleteTask = async (req, res) => {
     try {
-        const task = await Task.findByIdAndDelete(req.params.id);
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'Task not found' });
+
+        await Task.findByIdAndDelete(req.params.id);
+
         await logAction({
             userId: req.user.id,
             userName: req.user.name,
@@ -45,9 +69,57 @@ const deleteTask = async (req, res) => {
             taskTitle: task.title,
             details: 'Task deleted'
         });
+
         res.status(200).json({ message: 'Task deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
+//smart assign
+const User = require('../models/User');
+const Task = require('../models/Task');
+const { logAction } = require('./actionLogger');
+
+// Smart Assign Controller
+exports.smartAssign = async (req, res) => {
+    try {
+        // Get all users
+        const users = await User.find();
+
+        // For each user, count active tasks (Todo or In Progress)
+        const userTaskCounts = await Promise.all(
+            users.map(async (user) => {
+                const count = await Task.countDocuments({
+                    assignedTo: user._id,
+                    status: { $in: ['Todo', 'In Progress'] }
+                });
+                return { user, count };
+            })
+        );
+
+        // Find user with fewest active tasks
+        const sorted = userTaskCounts.sort((a, b) => a.count - b.count);
+        const selectedUser = sorted[0].user;
+
+        // Assign this task to them
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'Task not found' });
+
+        task.assignedTo = selectedUser._id;
+        await task.save();
+
+        await logAction({
+            userId: req.user.id,
+            userName: req.user.name,
+            actionType: 'ASSIGN_TASK',
+            taskId: task._id,
+            taskTitle: task.title,
+            details: `Smart Assigned to ${selectedUser.name}`
+        });
+
+        res.status(200).json({ message: `Assigned to ${selectedUser.name}`, task });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

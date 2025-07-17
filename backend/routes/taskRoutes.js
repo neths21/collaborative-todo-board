@@ -18,3 +18,7 @@ router.route('/:id')
     .delete(protect, deleteTask);
 
 module.exports = router;
+
+const { smartAssign } = require('../controllers/taskController');
+
+router.put('/:id/smart-assign', protect, smartAssign);
