@@ -1,15 +1,12 @@
-import KanbanBoard from "../components/Kanban/KanbanBoard";
-import ActivityLogPanel from "../components/ActivityLog/ActivityLogPanel";
+import KanbanBoard from '../components/Kanban/KanbanBoard';
+import ActivityLogPanel from '../components/ActivityLog/ActivityLogPanel';
 
-const KanbanPage = () => {
+
+export default function KanbanPage() {
     return (
         <div className="kanban-page-container">
-            <ActivityLogPanel />
-            <div className="kanban-main-board">
-                <KanbanBoard />
-            </div>
+            
+            <KanbanBoard />
         </div>
     );
-};
-
-export default KanbanPage;
+}

@@ -10,7 +10,7 @@ function AppRoutes() {
         <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/kanban" element={user ? <KanbanPage /> : <Navigate to="/login" />} />
+            <Route path="/kanban" element={user ? <KanbanPage /> : <Navigate to="/" />} />
             <Route path="*" element={<Navigate to="/kanban" />} />
         </Routes>
     );
